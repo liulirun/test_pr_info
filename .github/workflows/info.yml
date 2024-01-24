@@ -1,13 +1,11 @@
 name: Auto-PR-Clickup
 
 on:
-  push:
-    branches:
-      - 'test'
-  # pull_request:
-  #   types: [opened, reopened]
-  #   # branches:
-    #   - 'auto_pr_clickup_wip'
+  # push:
+  #   branches:
+  #     - 'test'
+  pull_request:
+    types: [opened, reopened]
   workflow_dispatch: # This event allows manual triggering
 
 jobs:
@@ -15,13 +13,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fill Clickup Pull Requests
-        run: |
-          echo "start here now"
-
       - name: List Envs
         run: env
 
-      - name: Echo Curl version
+      - name: PR number
         run: |
-          curl -V
+          echo ${{ github.event.pull_request.number }}
+          echo ${{ github.event.pull_request.body }}
+
+      # - name: Pull Object
+      #   env:
+      #     PR_NUMBER: ${{ github.event.pull_request.number }}
+      #     GH_TOKEN: ${{ github.token }}
+      #   run: |
+      #     gh pr view "$PR_NUMBER"
+      # - name: Fill Clickup Pull Requests
+      #   run: |
+      #     echo "start here now"
+
+      # - name: Event Object
+      #   run: |
+      #     for element in ${{ github.event }}
+      #       do
+      #           echo "Current element: $element"
+      #       done
