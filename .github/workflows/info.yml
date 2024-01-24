@@ -20,6 +20,14 @@ jobs:
         run: |
           echo ${{ github.event.pull_request.number }}
 
+      - name: Pull Object
+        run: |
+          echo ${{ github.event.pull_request }}
+
+      - name: Event
+        run: |
+          echo ${{ github.event }}
+
       - name: Fill Clickup Pull Requests
         run: |
           echo "start here now"
