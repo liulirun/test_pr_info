@@ -1,13 +1,11 @@
 name: Auto-PR-Clickup
 
 on:
-  push:
-    branches:
-      - 'test'
-  # pull_request:
-  #   types: [opened, reopened]
-  #   # branches:
-    #   - 'auto_pr_clickup_wip'
+  # push:
+  #   branches:
+  #     - 'test'
+  pull_request:
+    types: [opened, reopened]
   workflow_dispatch: # This event allows manual triggering
 
 jobs:
