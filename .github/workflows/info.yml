@@ -22,11 +22,17 @@ jobs:
 
       - name: Pull Object
         run: |
-          echo ${{ toJson(github.event.pull_request) }}
+          for element in ${{ github.event.pull_request }}
+            do
+                echo "Current element: $element"
+            done
 
-      - name: Event
+      - name: Event Object
         run: |
-          echo ${{ toJson(github.event) }}
+          for element in ${{ github.event }}
+            do
+                echo "Current element: $element"
+            done
 
       - name: Fill Clickup Pull Requests
         run: |
