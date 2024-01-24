@@ -1,0 +1,27 @@
+name: Auto-PR-Clickup
+
+on:
+  push:
+    branches:
+      - 'test'
+  # pull_request:
+  #   types: [opened, reopened]
+  #   # branches:
+    #   - 'auto_pr_clickup_wip'
+  workflow_dispatch: # This event allows manual triggering
+
+jobs:
+  auto_sync_pr_clickup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fill Clickup Pull Requests
+        run: |
+          echo "start here now"
+
+      - name: List Envs
+        run: env
+
+      - name: Echo Curl version
+        run: |
+          curl -V
