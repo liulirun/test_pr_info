@@ -22,11 +22,11 @@ jobs:
 
       - name: Pull Object
         run: |
-          echo ${{ github.event.pull_request }}
+          echo ${{ toJson(github.event.pull_request) }}
 
       - name: Event
         run: |
-          echo ${{ github.event }}
+          echo ${{ toJson(github.event) }}
 
       - name: Fill Clickup Pull Requests
         run: |
