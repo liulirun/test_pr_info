@@ -1,13 +1,8 @@
-name: Auto-PR-Clickup
+name: auto-pr-clickup
 
 on:
-  push:
-    branches:
-      - 'test'
-  # pull_request:
-  #   types: [opened, reopened]
-  #   # branches:
-    #   - 'auto_pr_clickup_wip'
+  pull_request:
+    types: [opened, reopened]
   workflow_dispatch: # This event allows manual triggering
 
 jobs:
@@ -15,13 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fill Clickup Pull Requests
+      - name: link_pr_to_clickup
+        env: 
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
         run: |
-          echo "start here now"
+          clickup_id=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=45031420/).*?(?=\))' | tr -d '[:space:]')
+          echo "clickup_id=$clickup_id"
+          if [[ $clickup_id =~ ^[A-Za-z]{2}-[0-9]+$ ]]; then
+            pr_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/${{ github.event.pull_request.number }}"
+            curl -i -X POST \
+              "https://api.clickup.com/api/v2/task/{$clickup_id}/field/68107229-c64e-48fe-8554-11eb32a00f33?custom_task_ids=true&team_id=45031420" \
+              -H "Authorization: $CLICKUP_TOKEN" \
+              -H 'Content-Type: application/json' \
+              -d "{
+                \"value\":\"$pr_url\"
+              }" > /dev/null
+            echo "pr_url:$pr_url linked to clickup task:$clickup_id"
+          else
+            echo "The clickup_id does not match the pattern of numbers."
+          fi
 
       - name: List Envs
         run: env
-
-      - name: Echo Curl version
-        run: |
-          curl -V
