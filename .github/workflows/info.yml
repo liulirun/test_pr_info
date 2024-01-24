@@ -1,13 +1,13 @@
-name: Auto-PR-Clickup
+name: auto-pr-clickup
+run-name: ${{ github.event.repository.name }} pr:${{ github.event.pull_request.number }} by @${{ github.actor }}
 
 on:
-  push:
-    branches:
-      - 'test'
-  # pull_request:
-  #   types: [opened, reopened]
-  #   # branches:
-    #   - 'auto_pr_clickup_wip'
+  pull_request:
+    types: [opened, reopened]
+    branches-ignore:    
+      - 'rel_**'
+      - 'dbUpdate_**'
+
   workflow_dispatch: # This event allows manual triggering
 
 jobs:
@@ -15,13 +15,65 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fill Clickup Pull Requests
+      - name: print_repo
         run: |
-          echo "start here now"
+          pr_url="${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          echo "pr_url=$pr_url"
+          echo "repository=${{ github.repository }}"
 
-      - name: List Envs
-        run: env
+      - name: print_pr_context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
-      - name: Echo Curl version
+      - name: print_event_pr_info
+        env:
+          EVENT_CONTEXT: ${{ toJSON(github.event.pull_request) }}
         run: |
-          curl -V
+          echo "$EVENT_CONTEXT"
+
+      - name: print_branch_name
+        env:
+          EVENT_CONTEXT: ${{ toJSON(github.event.pull_request.name) }}
+        run: |
+          echo $EVENT_CONTEXT
+
+      - name: print_env
+        run: env|sort
+
+      # - name: Post comment to PR
+      #   env: 
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     # pull_request_number="123"  # Replace with the actual pull request number
+      #     comment_body="This is a test comment."  # Replace with your desired comment
+
+      #     repo_owner="liulirun"  # Replace with the owner of the repository
+      #     repo_name="test_pr_info"  # Replace with the name of the repository
+      #     access_token="your_access_token"  # Replace with your personal access token
+
+      #     curl -X POST \
+      #       -H "Authorization: Bearer $access_token" \
+      #       -H "Accept: application/vnd.github.v3+json" \
+      #       -d "{\"body\": \"$comment_body\"}" \
+      #       "https://api.github.com/repos/$repo_owner/$repo_name/issues/${{ github.event.pull_request.number }}/comments"
+
+      # - name: link_pr_to_clickup
+      #   env: 
+      #     CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+      #   run: |
+      #     clickup_id=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=45031420/).*?(?=\))' | tr -d '[:space:]')
+      #     echo "clickup_id=$clickup_id"
+      #     if [[ $clickup_id =~ ^[A-Za-z]{2}-[0-9]+$ ]]; then
+      #       pr_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/${{ github.event.pull_request.number }}"
+      #       curl -i -X POST \
+      #         "https://api.clickup.com/api/v2/task/{$clickup_id}/field/68107229-c64e-48fe-8554-11eb32a00f33?custom_task_ids=true&team_id=45031420" \
+      #         -H "Authorization: $CLICKUP_TOKEN" \
+      #         -H 'Content-Type: application/json' \
+      #         -d "{
+      #           \"value\":\"$pr_url\"
+      #         }" > /dev/null
+      #       echo "pr_url:$pr_url linked to clickup task:$clickup_id"
+      #     else
+      #       echo "The clickup_id does not match the pattern of numbers."
+      #     fi
