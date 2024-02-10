@@ -3,7 +3,7 @@ run-name: ${{ github.event.repository.name }} pr:${{ github.event.pull_request.n
 
 on:
   pull_request:
-    types: [opened, reopened]
+    # types: [opened, reopened]
     branches-ignore:    
       - 'rel_**'
       - 'dbUpdate_**'
@@ -26,20 +26,20 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: print_event_pr_info
-        env:
-          EVENT_CONTEXT: ${{ toJSON(github.event.pull_request) }}
-        run: |
-          echo "$EVENT_CONTEXT"
+      # - name: print_event_pr_info
+      #   env:
+      #     EVENT_CONTEXT: ${{ toJSON(github.event.pull_request) }}
+      #   run: |
+      #     echo "$EVENT_CONTEXT"
 
-      - name: print_branch_name
-        env:
-          EVENT_CONTEXT: ${{ toJSON(github.event.pull_request.name) }}
-        run: |
-          echo $EVENT_CONTEXT
+      # - name: print_branch_name
+      #   env:
+      #     EVENT_CONTEXT: ${{ toJSON(github.event.pull_request.name) }}
+      #   run: |
+      #     echo $EVENT_CONTEXT
 
-      - name: print_env
-        run: env|sort
+      # - name: print_env
+      #   run: env|sort
 
       # - name: Post comment to PR
       #   env: 
