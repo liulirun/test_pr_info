@@ -3,11 +3,10 @@ run-name: ${{ github.event.repository.name }} pr:${{ github.event.pull_request.n
 
 on:
   pull_request:
-    # types: [opened, reopened]
+    types: [opened, reopened]
     branches-ignore:
       - 'rel_test'
       - 'rel_**'
-      - 'dbUpdate_**'
 
   workflow_dispatch: # This event allows manual triggering
 
