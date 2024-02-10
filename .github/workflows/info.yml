@@ -26,11 +26,11 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      # - name: print_event_pr_info
-      #   env:
-      #     EVENT_CONTEXT: ${{ toJSON(github.event.pull_request) }}
-      #   run: |
-      #     echo "$EVENT_CONTEXT"
+      - name: print_event_pr_info
+        env:
+          EVENT_CONTEXT: ${{ toJSON(github.event.pull_request) }}
+        run: |
+          echo "$EVENT_CONTEXT"
 
       # - name: print_branch_name
       #   env:
@@ -38,8 +38,8 @@ jobs:
       #   run: |
       #     echo $EVENT_CONTEXT
 
-      # - name: print_env
-      #   run: env|sort
+      - name: print_env
+        run: env|sort
 
       # - name: Post comment to PR
       #   env: 
