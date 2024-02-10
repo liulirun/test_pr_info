@@ -3,12 +3,9 @@ run-name: ${{ github.event.repository.name }} pr:${{ github.event.pull_request.n
 
 on:
   pull_request:
-    types: [opened, reopened]
     branches-ignore:
       - 'rel_test'
       - 'rel_**'
-
-  workflow_dispatch: # This event allows manual triggering
 
 jobs:
   auto_sync_pr_clickup:
