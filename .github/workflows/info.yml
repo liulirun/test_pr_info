@@ -4,7 +4,8 @@ run-name: ${{ github.event.repository.name }} pr:${{ github.event.pull_request.n
 on:
   pull_request:
     # types: [opened, reopened]
-    branches-ignore:    
+    branches-ignore:
+      - 'rel_test'
       - 'rel_**'
       - 'dbUpdate_**'
 
