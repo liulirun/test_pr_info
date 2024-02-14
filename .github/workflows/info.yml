@@ -19,6 +19,10 @@ jobs:
           PR_ID="${{ github.event.pull_request.number }}"
           echo "BRANCH_NAME=$BRANCH_NAME"
           echo "PR_ID=$PR_ID"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_API_URL="${{ github.event.pull_request.url }}"
+          echo "PR_URL=$PR_URL"
+          echo "PR_API_URL=$PR_API_URL"
 
       - name: print_github_event_info
         env:
