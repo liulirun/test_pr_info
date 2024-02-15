@@ -78,11 +78,12 @@ jobs:
           clickup_id=$(echo $BRANCH_NAME | grep -oE "($from_branch_name_pattern)" | head -n 1)
 
           if [ -n "$clickup_id" ]; then #branch name
-              echo "ID from branch name: clickup_id=$clickup_id"
+              echo "get clickupID from branch name: clickup_id=$clickup_id"
               clickup_hyper_link="[$clickup_id]($CLICKUP_PREFIX/$CLICKUP_TEAM_ID/$clickup_id)"
           else #from pr description
               clickup_link=$(echo $PR_DESCRIPTION | grep -oP "(?<=$CLICKUP_PREFIX/).*?(?=\))" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-              echo "ID From PR description: clickup_link=$clickup_link."
+              echo "get clickupID from PR description"
+              echo "  debug: clickup_link=$clickup_link."
               if [ -n "$clickup_link" ]; then
                   if [[ $clickup_link == *"$CLICKUP_TEAM_ID/"* ]]; then
                       clickup_id=$(echo "$clickup_link" | sed "s/$CLICKUP_TEAM_ID\///" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
@@ -124,6 +125,7 @@ jobs:
               echo "POST TO CLICKUP FAILED"
               echo "  debug: clickup_api_url=$clickup_api_url"
               echo "  debug: clickup_res=$clickup_res"
+              echo
               if [[ $clickup_res == *"Cannot POST /api/v2/task/"* ]]; then            
                   pr_comment_body="clickup task id is INVALID in branch name or PR description."
               fi
