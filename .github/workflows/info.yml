@@ -48,3 +48,107 @@ jobs:
           EVENT_CONTEXT: ${{ toJSON(github.event.pull_request) }}
         run: |
           echo "$EVENT_CONTEXT"
+
+      - name: test_pr_link
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref }}
+          PR_ID: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_API_URL: ${{ github.event.pull_request.url }}
+          PR_COMMENT_URL: ${{ github.event.pull_request.comments_url }}
+          PR_DESCRIPTION: ${{ github.event.pull_request.body }}
+
+        run: |
+          CLICKUP_PR_FIELD_ID="68107229-c64e-48fe-8554-11eb32a00f33"
+          CLICKUP_TEAM_ID="45031420"
+          CLICKUP_API_PREFIX="https://api.clickup.com/api/v2/task"
+          CLICKUP_PREFIX="https://app.clickup.com/t"
+          echo "  input_env:CLICKUP_TOKEN=$CLICKUP_TOKEN"
+          echo "  input_env:GH_TOKEN=$GH_TOKEN"
+          echo "  input_env:BRANCH_NAME=$BRANCH_NAME"
+          echo "  input_env:PR_ID=$PR_ID"
+          echo "  input_env:PR_URL=$PR_URL"
+          echo "  input_env:PR_API_URL=$PR_API_URL"
+          echo "  input_env:PR_COMMENT_URL=$PR_COMMENT_URL"
+          echo "  input_env:PR_DESCRIPTION=$PR_DESCRIPTION"
+
+          from_branch_name_pattern="[A-Za-z]+-[0-9]+"
+          clickup_id=$(echo $BRANCH_NAME | grep -oE "($from_branch_name_pattern)" | head -n 1)
+
+          if [ -n "$clickup_id" ]; then #branch name
+              echo "ID from branch name: clickup_id=$clickup_id"
+              clickup_hyper_link="[$clickup_id]($CLICKUP_PREFIX/$CLICKUP_TEAM_ID/$clickup_id)"
+          else #from pr description
+              clickup_link=$(echo $PR_DESCRIPTION | grep -oP "(?<=$CLICKUP_PREFIX/).*?(?=\))" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+              echo "ID From PR description: clickup_link=$clickup_link."
+              if [ -n "$clickup_link" ]; then
+                  if [[ $clickup_link == *"$CLICKUP_TEAM_ID/"* ]]; then
+                      clickup_id=$(echo "$clickup_link" | sed "s/$CLICKUP_TEAM_ID\///" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                      echo "  CUSTOM clickup_id=$clickup_id."
+                      if [[ $clickup_id =~ $from_branch_name_pattern$ ]]; then
+                          clickup_hyper_link="[$clickup_id]($CLICKUP_PREFIX/$CLICKUP_TEAM_ID/$clickup_id)"
+                      fi
+                  else
+                      clickup_id=$(echo "$clickup_link" |sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                      echo "  ORIGINAL clickup_link: clickup_id=$clickup_id."
+                      clickup_hyper_link="[$clickup_id]($CLICKUP_PREFIX/$clickup_id)"            
+                  fi
+              fi
+          fi
+
+          clickup_api_url="$CLICKUP_API_PREFIX/$clickup_id/field/$CLICKUP_PR_FIELD_ID?custom_task_ids=true&team_id=$CLICKUP_TEAM_ID"
+          clickup_res=$(curl -s -X POST "$clickup_api_url" \
+                          -H 'Content-Type: application/json' \
+                          -H "Authorization: $CLICKUP_TOKEN" \
+                          -d "{\"value\":\"$PR_URL\"}"
+                      )
+
+          if [[ $clickup_res == "{}" ]]; then
+              echo "POST TO CLICKUP SUCCESS"
+              pr_comment_body="PR linked to clickup: $clickup_hyper_link"
+
+              if [[ $PR_DESCRIPTION =~ "https://app.clickup.com/t" ]]; then   
+                  echo "PR_DESCRIPTION contains clickup link, removing it"
+                  PR_DESCRIPTION="$(echo -e "$PR_DESCRIPTION" | sed -e '/https:\/\/app.clickup.com\/t/d')"
+              fi
+              new_pr_description="clickup task: $clickup_hyper_link\r\n$PR_DESCRIPTION"
+              patch_description_res=$(curl -s -X PATCH \
+                          -H "Authorization: token $GH_TOKEN" \
+                          -H "Accept: application/vnd.github.v3+json" \
+                          "$PR_API_URL" \
+                          -d "{\"body\": \"$new_pr_description\"}"
+                      )
+          else
+              echo "POST TO CLICKUP FAILED"
+              echo "  debug: clickup_api_url=$clickup_api_url"
+              echo "  debug: clickup_res=$clickup_res"
+              if [[ $clickup_res == *"Cannot POST /api/v2/task/"* ]]; then            
+                  pr_comment_body="clickup task id is INVALID in branch name or PR description."
+              fi
+              if [[ $clickup_res == *"ACCESS_079"* ]]; then            
+                  pr_comment_body="clickup SVC token does not have access to task $clickup_hyper_link."
+              fi
+              if [[ $clickup_res == *"FIELD_233"* ]]; then            
+                  pr_comment_body="clickup task $clickup_hyper_link does not contains Pull Request custom field."
+              fi
+              if [[ $clickup_res == *"OAUTH_027"* ]]; then
+                  pr_comment_body="can not find clickup task with ID: $clickup_id."
+              fi
+              pr_comment_body="$pr_comment_body\r\nPlease link manually."
+          fi
+
+          gh_res=$(curl -s -X POST \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              $PR_COMMENT_URL \
+              -d "{\"body\": \"$pr_comment_body\"}"
+          )
+
+          echo 
+          echo "Final: clickup_id=$clickup_id"
+          echo "Final: clickup_link=$clickup_link"
+          echo "Final: clickup_hyper_link=$clickup_hyper_link"
+          echo "Final: new_pr_description=$new_pr_description"
+          echo "Final: pr_comment_body=$pr_comment_body"
