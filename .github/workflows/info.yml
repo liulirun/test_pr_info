@@ -19,12 +19,15 @@ jobs:
           PR_ID="${{ github.event.pull_request.number }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
           PR_API_URL="${{ github.event.pull_request.url }}"
+          PR_DESCRIPTION="${{ github.event.pull_request.body }}"
           echo "PR_URL=$PR_URL"
           echo "BRANCH_NAME=$BRANCH_NAME"
           echo "PR_ID=$PR_ID"
           echo "PR_API_URL=$PR_API_URL"
-          PR_DESCRIPTION="${{ github.event.pull_request.body }}"
           echo "PR_DESCRIPTION=$PR_DESCRIPTION"
+          
+          PR_COMMENTS_URL="${{ github.event.pull_request.comments_url }}"
+          echo "PR_COMMENTS_URL=$PR_COMMENTS_URL"
 
       - name: print_github_event_info
         env:
