@@ -1,0 +1,14 @@
+name: PrintEnv
+run-name: ${{ github.event.repository.name }} by @${{ github.actor }}
+
+on:
+  push: 
+
+jobs:
+  pass_in_secret_to_template:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: liulirun/github_workflow_template/.github/workflows/env_template.yml@main
+    secrets: inherit
+    

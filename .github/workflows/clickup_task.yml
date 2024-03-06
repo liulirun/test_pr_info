@@ -1,0 +1,13 @@
+name: PR Info Caller
+run-name: ${{ github.event.repository.name }} pr:${{ github.event.pull_request.number }} by @${{ github.actor }}
+
+on:
+  push:
+
+jobs:
+  pr_link_to_clickup:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: liulirun/github_workflow_template/.github/workflows/clickup_task_template.yml@main
+    secrets: inherit
