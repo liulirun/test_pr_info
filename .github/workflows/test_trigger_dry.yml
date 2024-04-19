@@ -1,0 +1,24 @@
+name: Test_Trigger_With_Environment_And_Label
+
+# each commit will treat like dev
+# label stage/production on the pr will run on that environment 
+# need to set up label for dev/stage/production for each repo
+# stage/production environment need reviewer ruleset to allow approval
+on:
+  # push:
+  pull_request:
+    types:
+      - labeled
+
+jobs:
+  deploy:
+    runs-on: 'ubuntu-latest'
+    environment: ${{ github.event.label.name }}
+    steps:
+      - run: |
+          if [ -z "${{ github.event.label.name }}" ]; then
+            echo "deloying dev"
+            # should add dev label to PR if runs success
+          else
+            echo "deploy to ${{ github.event.label.name }}"
+          fi

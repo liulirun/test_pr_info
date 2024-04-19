@@ -1,0 +1,25 @@
+name: Print_Debug
+
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  print_debug_info:
+    runs-on: 'ubuntu-latest'
+    steps:     
+      - name: Debug - Label Name
+        run: |
+          echo "Label name = ${{ github.event.label.name }}"
+
+      - name: Debug - Github Context Info
+        env:
+          GITHUB_EVENT: ${{ toJson(github.event) }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_EVENT"
+          echo "$GITHUB_CONTEXT"
+
+      - name: Debug - Envs
+        run: env
