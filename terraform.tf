@@ -1,5 +1,5 @@
-terraform {
-  backend "gcs" {
-    bucket = "kobo-terraform-state-dev"
-  }
-}
+# terraform {
+#   backend "gcs" {
+#     bucket = "kobo-terraform-state-dev"
+#   }
+# }
