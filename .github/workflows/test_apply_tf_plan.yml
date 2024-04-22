@@ -1,10 +1,12 @@
 name: 'Apply terraform plan'
 
 on:
-  push:
-  pull_request:
-    types:
-      - closed
+  issues:
+    types: [opened, reopened]
+  # push:
+  # pull_request:
+  #   types:
+  #     - closed
 
 jobs:
   # apply-terraform-plan:

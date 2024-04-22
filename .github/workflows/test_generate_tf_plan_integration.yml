@@ -1,8 +1,8 @@
 name: 'Generate terraform plan'
 
 on:
-  # pull_request:
-  issues:
+  push:
+  pull_request:
     types: [opened, reopened]
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
       matrix:
         env:
             - dev
-            - stage    
+            # - stage    
 
     defaults:
       run:
