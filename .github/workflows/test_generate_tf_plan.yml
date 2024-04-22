@@ -26,13 +26,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     
-    - name: Echo
-      run: |
-        ls
-
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3.0.0
+      uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.8.0
         terraform_wrapper: false
@@ -49,7 +45,6 @@ jobs:
       id: plan
       shell: bash
       env:
-        # TF_VAR_github_token: ${{ secrets.TOKEN_GITHUB }}
         TF_VAR_github_token: ${{ secrets.TOKEN_GITHUB_TERRAFORM }}
         TF_LOG: INFO
       run: |
