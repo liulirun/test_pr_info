@@ -9,16 +9,21 @@ jobs:
   print_debug_info:
     runs-on: 'ubuntu-latest'
     steps:     
-      - name: Debug - Label Name
+      - name: Debug - Placeholder
         run: |
-          echo "Label name = ${{ github.event.label.name }}"
+          echo "${{github.event.pull_request.merged}}"
+
+      - name: Debug - Github Event Context Info
+        env:
+          GITHUB_EVENT: ${{ toJson(github.event) }}
+        run: |
+          echo "$GITHUB_EVENT"
 
       - name: Debug - Github Context Info
         env:
-          GITHUB_EVENT: ${{ toJson(github.event) }}
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          echo "$GITHUB_EVENT"
+          echo "${{github.event.pull_request.merged}}"
           echo "$GITHUB_CONTEXT"
 
       - name: Debug - Envs

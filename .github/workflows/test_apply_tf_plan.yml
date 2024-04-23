@@ -3,69 +3,49 @@ name: 'Apply terraform plan'
 on:
   # issues:
   #   types: [opened, reopened]
-  # push:
+  push:
   pull_request:
     types:
       - closed
 
 jobs:
     apply-terraform-plan:
-      if: github.event.pull_request.merged == true
+      # if: github.event.pull_request.merged == true
       name: 'apply-terraform-plan'
       runs-on: 'ubuntu-latest'
       # runs-on: [self-hosted, Linux]
-      # strategy:
-      #   matrix:
-      #     env:
-      #       - dev
-      #       - stage
-      # environment: ${{ matrix.env }}
+      strategy:
+        matrix:
+          env:
+            - dev
+            - stage
+      environment: ${{ matrix.env }}
       
       steps:
       # Checkout the repository to the GitHub Actions runner
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4    
 
-      - name: Debug - Placeholder
-        run: |
-          echo "${{github.event.pull_request.merged}}"
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+          
+      # Lee: we could get rid of this step
+      # Checks that all Terraform configuration files adhere to a canonical format
+      - name: Terraform Format
+        run: terraform fmt -check
 
-      - name: Debug - Github Event Context Info
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        id: apply
+        shell: bash
         env:
-          GITHUB_EVENT: ${{ toJson(github.event) }}
+          TF_VAR_github_token: ${{ secrets.TOKEN_GITHUB_TERRAFORM }}
+          TF_LOG: INFO
         run: |
-          echo "$GITHUB_EVENT"
-
-      - name: Debug - Github Context Info
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "${{github.event.pull_request.merged}}"
-          echo "$GITHUB_CONTEXT"
-
-      - name: Debug - Envs
-        run: env      
-
-    # # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
-    # - name: Setup Terraform
-    #   uses: hashicorp/setup-terraform@v3
-    #   with:
-    #     terraform_version: 1.8.0
-        
-    # # Lee: we could get rid of this step
-    # # Checks that all Terraform configuration files adhere to a canonical format
-    # - name: Terraform Format
-    #   run: terraform fmt -check
-
-    # # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    # - name: Terraform Init
-    #   run: terraform init
-
-    # - name: Terraform Apply
-    #   id: apply
-    #   shell: bash
-    #   env:
-    #     TF_VAR_github_token: ${{ secrets.TOKEN_GITHUB_TERRAFORM }}
-    #     TF_LOG: INFO
-    #   run: |
-    #     terraform apply -auto-approve
+          terraform apply -auto-approve

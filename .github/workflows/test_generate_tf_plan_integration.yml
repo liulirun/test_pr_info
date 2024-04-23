@@ -2,8 +2,8 @@ name: 'Generate terraform plan'
 
 on:
   # push:
-  pull_request:
-    types: [opened, reopened]
+  issues:
+    types: [closed]
 
 jobs:
 
