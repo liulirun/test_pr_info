@@ -1,9 +1,10 @@
 name: 'Test PR All Type'
 
 on:
-  issues:
-    types: 
-      - closed
+  pull_request:
+  # issues:
+  #   types: 
+  #     - closed
 
 jobs:
     apply-terraform-plan:
