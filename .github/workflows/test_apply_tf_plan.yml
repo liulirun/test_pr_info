@@ -3,7 +3,7 @@ name: 'Apply terraform plan'
 on:
   # issues:
   #   types: [opened, reopened]
-  push:
+  # push:
   pull_request:
     types:
       - closed
