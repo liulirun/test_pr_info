@@ -1,7 +1,10 @@
 name: 'Test PR All Type'
 
 on:
-  pull_request:
+  issues:
+    types:
+      - closed  
+  # pull_request:
     # branches: [ "main" ]
 
 jobs:
