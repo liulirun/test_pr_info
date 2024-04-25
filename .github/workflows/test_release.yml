@@ -41,7 +41,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_TERRAFORM }} 
         with:
-          tag_name: ${{ github.sha }}
+          tag_name: "rel_1"
+          # tag_name: ${{ github.sha }}
           release_name: release-${{ github.sha }}
           body: |
             Changes in this Release
