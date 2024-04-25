@@ -10,9 +10,15 @@ jobs:
   print_debug_info:
     runs-on: 'ubuntu-latest'
     steps:
-      - name: Debug - Placeholder
+      - name: Debug - 1
         run: |
           echo "${{ github.ref }}"
+          echo "${{ github.sha }}"
+          echo "${GITHUB_SHA::7}"
+
+      # - name: Debug - 2
+      #   run: |
+      #     echo "${GITHUB_SHA::7}"
 
       - name: Debug - Github Event Context Info
         env:
@@ -35,8 +41,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_TERRAFORM }} 
         with:
-          tag_name: ${{ github.ref }}
-          release_name: release-${{ github.ref }}
+          tag_name: ${GITHUB_SHA::7}
+          release_name: release-${GITHUB_SHA::7}
           body: |
             Changes in this Release
           draft: false
