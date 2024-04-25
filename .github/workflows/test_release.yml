@@ -14,20 +14,6 @@ jobs:
         run: |
           echo "${{ github.ref }}"
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_TERRAFORM }} 
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: release-${{ github.ref }}
-          body: |
-            Changes in this Release
-          draft: false
-          prerelease: false      
-
-
       - name: Debug - Github Event Context Info
         env:
           GITHUB_EVENT: ${{ toJson(github.event) }}
@@ -42,3 +28,17 @@ jobs:
 
       - name: Debug - Envs
         run: env
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_TERRAFORM }} 
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: release-${{ github.ref }}
+          body: |
+            Changes in this Release
+          draft: false
+          prerelease: false      
+        
