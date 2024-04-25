@@ -1,0 +1,67 @@
+#test 1
+name: Test_Release
+
+# on:
+#   push: 
+on:
+  push:
+
+jobs:
+  print_debug_info:
+    runs-on: 'ubuntu-latest'
+    strategy:
+      matrix:
+        env:
+          - dev
+          # - stage
+    environment: ${{ matrix.env }}    
+    steps:
+      - name: Debug - 1
+        run: |
+          echo "${{ github.ref }}"
+          echo "${{ github.sha }}"
+          echo "${GITHUB_SHA::7}"
+
+      # - name: Debug - 2
+      #   run: |
+      #     echo "${GITHUB_SHA::7}"
+    # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      # - name: Debug - Github Event Context Info
+      #   env:
+      #     GITHUB_EVENT: ${{ toJson(github.event) }}
+      #   run: |
+      #     echo "$GITHUB_EVENT"
+
+      # - name: Debug - Github Context Info
+      #   env:
+      #     GITHUB_CONTEXT: ${{ toJson(github) }}
+      #   run: |
+      #     echo "$GITHUB_CONTEXT"
+
+      # - name: Debug - Envs
+      #   run: env
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.sha }} - ${{ matrix.env }} 
+          path: |
+            1.txt
+
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1.1.4
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_TERRAFORM }} 
+      #   with:
+      #     tag_name: "rel_1"
+      #     # tag_name: ${{ github.sha }}
+      #     release_name: release-${{ github.sha }}
+      #     body: |
+      #       Changes in this Release
+      #     draft: false
+      #     prerelease: false      
+        
