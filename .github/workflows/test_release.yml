@@ -12,20 +12,20 @@ jobs:
     steps:
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           tag_name: ${{ github.ref }}
-          release_name: TF-${{ github.ref }}
+          release_name: release-${{ github.ref }}
           body: |
             Changes in this Release
           draft: false
           prerelease: false      
 
-      - name: Debug - Placeholder
-        run: |
-          echo "${{github.event.pull_request.merged}}"
+      # - name: Debug - Placeholder
+      #   run: |
+      #     echo "${{github.event.pull_request.merged}}"
 
       - name: Debug - Github Event Context Info
         env:
@@ -37,7 +37,6 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          echo "${{github.event.pull_request.merged}}"
           echo "$GITHUB_CONTEXT"
 
       - name: Debug - Envs
