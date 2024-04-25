@@ -1,17 +1,22 @@
-name: Print_Debug
+name: 'Test PR All Type'
 
 on:
-  issues:
-    types:
-      - closed
+  pull_request:
+    # branches: [ "main" ]
 
 jobs:
-  print_debug_info:
-    runs-on: 'ubuntu-latest'
-    steps:     
-      - name: Debug - Placeholder
+    apply-terraform-plan:
+      name: 'apply-terraform-plan'
+      runs-on: 'ubuntu-latest'
+      
+      steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v4    
+
+      - name: Debug - event number
         run: |
-          echo "${{github.event.pull_request.merged}}"
+          echo "${{github.event.number}}"
 
       - name: Debug - Github Event Context Info
         env:
@@ -28,3 +33,4 @@ jobs:
 
       - name: Debug - Envs
         run: env
+# if: github.event.review.state == 'approved'
